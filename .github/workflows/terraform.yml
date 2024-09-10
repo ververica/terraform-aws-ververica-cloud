@@ -1,0 +1,30 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform_fmt_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 'v1.5.5'
+
+      - name: Find changed files
+        id: changes
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            **.tf
+
+      - name: Terraform fmt check
+        run: |
+          terraform fmt -check ${{ steps.changes.outputs.all_changed_files }}
