@@ -11,6 +11,7 @@ output "iam_role_arn" {
 output "enabled_policies" {
   description = "The IAM policies that are enabled for the IAM Role"
   value = {
+    Glue              = var.enable_glue
     Kinesis           = var.enable_kinesis
     DynamoDB          = var.enable_dynamodb
     S3                = var.enable_s3

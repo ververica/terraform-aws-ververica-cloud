@@ -31,7 +31,23 @@ resource "aws_iam_role" "ververica_cloud_iam_role" {
   max_session_duration  = var.max_session_duration
   permissions_boundary  = var.role_permissions_boundary_arn
   assume_role_policy    = data.aws_iam_policy_document.trust_policy.json
+}
 
+data "aws_iam_policy_document" "glue" {
+  count = var.enable_glue ? 1 : 0
+  statement {
+    sid       = "AWSGlueCatalogPolicy"
+    effect    = "Allow"
+    actions   = ["glue:*"]
+    resources = var.glue_arns == null ? ["*"] : var.glue_arns
+  }
+}
+
+resource "aws_iam_role_policy" "glue" {
+  count  = var.enable_glue ? 1 : 0
+  name   = "VervericaCloud-GlueCatalog-InlinePolicy"
+  role   = aws_iam_role.ververica_cloud_iam_role.id
+  policy = data.aws_iam_policy_document.glue[0].json
 }
 
 data "aws_iam_policy_document" "kinesis" {

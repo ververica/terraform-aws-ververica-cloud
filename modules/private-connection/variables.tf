@@ -57,6 +57,18 @@ variable "tags" {
   default     = {}
 }
 
+variable "enable_glue" {
+  description = "Enable the AWS Glue Catalog Policies"
+  type        = bool
+  default     = false
+}
+
+variable "glue_arns" {
+  description = "A list of AWS Glue ARNs that Ververica Cloud will have access to"
+  type        = list(string)
+  default     = null
+}
+
 variable "enable_kinesis" {
   description = "Enable the Kinesis IAM Policies"
   type        = bool
