@@ -1,14 +1,24 @@
-# Ververica Cloud AWS Private Connection Terraform Module
+# Ververica Cloud AWS Terraform Modules
 
-[Ververica Cloud](https://ververica.cloud) offers the capability to establish private connections with AWS services. This set of modules is used to create VPC endpoint services and IAM Role on a user's AWS account that is later used by [Ververica Cloud](https://ververica.cloud) to allow accessing resources from Flink jobs in their AWS Account, like a RDS for MySQL or MSK.
+A collection of Terraform modules that provision the AWS-side resources required to
+integrate with [Ververica Cloud](https://ververica.cloud).
+
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| [`private-connection`](./modules/private-connection) | Creates VPC endpoint services and an IAM role so Ververica Cloud can reach resources (RDS, MSK, ElastiCache, …) running in your VPC. |
+| [`vpc-endpoint-service`](./modules/vpc-endpoint-service) | Lower-level building block used by `private-connection` to expose a single service via an NLB-fronted VPC endpoint service. |
+| [`byoc-agent`](./modules/byoc-agent) | Provisions the S3 bucket, IAM roles, and OIDC trust required by the Ververica Agent in a customer-owned ("Bring Your Own Cloud") AWS account. |
 
 ## Usage
-`private-connection`:
+
+### `private-connection`
 
 ```hcl
 module "private_connection" {
   source                       = "ververica/ververica-cloud/aws//modules/private-connection"
-  
+
   role_name                    = "VervericaCloudIAMRole"
   ververica_cloud_workspace_id = "my-workspace-id"
   enable_elasticache           = true
@@ -38,3 +48,28 @@ module "private_connection" {
   }
 }
 ```
+
+### `byoc-agent`
+
+```hcl
+data "aws_eks_cluster" "this" {
+  name = "my-eks-cluster"
+}
+
+module "byoc_agent" {
+  source = "ververica/ververica-cloud/aws//modules/byoc-agent"
+
+  bucket_name       = "my-vvc-agent-bucket"
+  oidc_provider_url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+
+  admin_role_subject_claims = [
+    "system:serviceaccount:ververica:ververica-agent",
+  ]
+
+  tags = {
+    Environment = "production"
+  }
+}
+```
+
+See [`modules/byoc-agent/README.md`](./modules/byoc-agent/README.md) for full input/output documentation and the [`examples/byoc-agent`](./examples/byoc-agent) directory for runnable examples.
