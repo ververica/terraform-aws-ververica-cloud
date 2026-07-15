@@ -12,13 +12,16 @@ variable "name" {
 # ---------------------------------------------------------------------------
 
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC. Must be /20 or larger when relying on auto-computed subnets; pass explicit subnet CIDR lists for smaller VPCs."
+  description = "CIDR block for the VPC. Must be /16 when relying on auto-computed subnets; pass explicit subnet CIDR lists for other VPC sizes."
   type        = string
   default     = "10.0.0.0/16"
 
   validation {
-    condition     = can(cidrhost(var.vpc_cidr, 0)) && tonumber(split("/", var.vpc_cidr)[1]) <= 20
-    error_message = "vpc_cidr must be a valid CIDR of /20 or larger (e.g. 10.0.0.0/16) so the module can carve a /24 subnet per availability zone. For smaller VPCs, supply private_subnet_cidrs and public_subnet_cidrs explicitly."
+    condition = can(cidrhost(var.vpc_cidr, 0)) && (
+      tonumber(split("/", var.vpc_cidr)[1]) == 16 ||
+      (length(var.private_subnet_cidrs) > 0 && length(var.public_subnet_cidrs) > 0)
+    )
+    error_message = "vpc_cidr must be a valid CIDR. If private_subnet_cidrs/public_subnet_cidrs are not provided, vpc_cidr must be /16 (e.g. 10.0.0.0/16) so the module can auto-compute /24 subnets."
   }
 }
 
@@ -26,12 +29,28 @@ variable "private_subnet_cidrs" {
   description = "CIDR blocks for private subnets. Must have one entry per availability zone used. Leave empty to auto-compute /24 slices from vpc_cidr."
   type        = list(string)
   default     = []
+
+  validation {
+    condition = length(var.private_subnet_cidrs) == 0 || (
+      length(var.private_subnet_cidrs) == var.availability_zone_count &&
+      alltrue([for cidr in var.private_subnet_cidrs : can(cidrhost(cidr, 0))])
+    )
+    error_message = "private_subnet_cidrs must be empty or contain exactly availability_zone_count valid CIDR blocks."
+  }
 }
 
 variable "public_subnet_cidrs" {
   description = "CIDR blocks for public subnets. Must have one entry per availability zone used. Leave empty to auto-compute /24 slices from vpc_cidr."
   type        = list(string)
   default     = []
+
+  validation {
+    condition = length(var.public_subnet_cidrs) == 0 || (
+      length(var.public_subnet_cidrs) == var.availability_zone_count &&
+      alltrue([for cidr in var.public_subnet_cidrs : can(cidrhost(cidr, 0))])
+    )
+    error_message = "public_subnet_cidrs must be empty or contain exactly availability_zone_count valid CIDR blocks."
+  }
 }
 
 variable "availability_zone_count" {
@@ -110,6 +129,11 @@ variable "desired_size" {
   description = "Desired number of worker nodes in the managed node group."
   type        = number
   default     = 2
+
+  validation {
+    condition     = var.desired_size >= var.min_size && var.desired_size <= var.max_size
+    error_message = "desired_size must be between min_size and max_size."
+  }
 }
 
 variable "min_size" {

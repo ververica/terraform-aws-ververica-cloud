@@ -41,11 +41,11 @@ terraform apply \
   -var="agent_bucket_name=my-vvc-agent-bucket"
 ```
 
-After apply, the identity that ran `terraform apply` and the role in
-`access_role_arn` both have cluster-admin. Point `kubectl` at the cluster with:
+After apply, the role in
+ `access_role_arn` has cluster-admin. Point `kubectl` at the cluster with:
 
 ```bash
-aws eks update-kubeconfig --name byoc-cluster --region eu-central-1
+aws eks update-kubeconfig --name byoc-cluster --region <your-region>
 ```
 
 Then install the Ververica Agent helm chart using the output values.

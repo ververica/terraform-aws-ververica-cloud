@@ -265,7 +265,7 @@ change — the variable/output surface can change across majors.
 | <a name="input_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#input\_public\_subnet\_cidrs) | CIDR blocks for public subnets. Must have one entry per availability zone used. Leave empty to auto-compute /24 slices from vpc\_cidr. | `list(string)` | `[]` | no |
 | <a name="input_single_nat_gateway"></a> [single\_nat\_gateway](#input\_single\_nat\_gateway) | Provision a single shared NAT gateway instead of one per availability zone. Reduces cost for non-production use; set to false for production HA. | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to all resources that support tagging. | `map(string)` | `{}` | no |
-| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the VPC. Must be /20 or larger when relying on auto-computed subnets; pass explicit subnet CIDR lists for smaller VPCs. | `string` | `"10.0.0.0/16"` | no |
+| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the VPC. Must be /16 when relying on auto-computed subnets; pass explicit subnet CIDR lists for other VPC sizes. | `string` | `"10.0.0.0/16"` | no |
 
 ## Outputs
 
