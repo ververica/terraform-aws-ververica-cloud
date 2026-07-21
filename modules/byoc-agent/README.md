@@ -31,7 +31,7 @@ module "byoc_agent" {
 
   # Recommended: lock the admin role's trust policy to a specific service account.
   admin_role_subject_claims = [
-    "system:serviceaccount:ververica:ververica-agent",
+    "system:serviceaccount:ververica:pyxis-admin",
   ]
 
   tags = {
@@ -50,7 +50,7 @@ module "byoc_agent" {
   existing_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.eu-central-1.amazonaws.com/id/EXAMPLE"
 
   admin_role_subject_claims = [
-    "system:serviceaccount:ververica:ververica-agent",
+    "system:serviceaccount:ververica:pyxis-admin",
   ]
 }
 ```
