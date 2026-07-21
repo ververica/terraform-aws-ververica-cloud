@@ -28,5 +28,5 @@ variable "agent_namespace" {
 variable "agent_service_account" {
   description = "Kubernetes service account name used by the Ververica Agent."
   type        = string
-  default     = "ververica-agent"
+  default     = "pyxis-admin"
 }
