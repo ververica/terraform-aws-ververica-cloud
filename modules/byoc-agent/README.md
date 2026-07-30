@@ -11,9 +11,6 @@ Agent in a customer-owned ("Bring Your Own Cloud") account:
 - An IAM OIDC provider — created by the module, or referenced by ARN if you already
   have one.
 
-This module replaces the legacy CloudFormation template that customers used to deploy
-in their accounts.
-
 ## Usage
 
 ### Create the OIDC provider
@@ -73,8 +70,8 @@ Common extension points:
 
 ## Security notes
 
-- The legacy CloudFormation template did not restrict `sub`/`aud` on the admin role's
-  trust policy. The module preserves that behaviour by default but exposes
+- This module does not restrict `sub`/`aud` on the admin role's
+  trust policy by default, but exposes
   `admin_role_subject_claims` to lock the role down to a specific Kubernetes service
   account. **Set this variable in production.**
 - `bucket_block_public_access`, `bucket_encryption_enabled` and `bucket_enforce_tls`
